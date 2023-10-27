@@ -1,0 +1,110 @@
+version: '3'
+services:
+
+  ## MySQL
+  db:
+    image: mysql:5.7.22
+    container_name: db
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: fsconsultoria
+      MYSQL_PASSWORD: admin123
+      MYSQL_DATABASE: navetse
+    volumes:
+      - dbdata:/var/lib/mysql/
+      - ./api-navetse:/var/www/
+      - ./api-navetse/mysql/my.cnf:/etc/mysql/my.cnf
+    networks:
+      - navetse-network
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -h localhost -u fsconsultoria -padmin123 -e 'SELECT 1'"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  ## Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: ./navetse/Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./navetse:/app
+    networks:
+      - navetse-network
+    environment:
+      SERVICE_NAME: frontend
+
+  ## Backend
+  app:
+    build:
+      context: .
+      dockerfile: ./api-navetse/Dockerfile
+    image: digitalocean.com/php
+    container_name: app
+    restart: unless-stopped
+    tty: true
+    depends_on:
+      db:
+          condition: service_healthy
+    environment:
+      SERVICE_NAME: app
+      SERVICE_TAGS: dev
+    working_dir: /var/www
+    volumes:
+      - ./api-navetse:/var/www
+      - ./api-navetse/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - navetse-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  ## Nginx
+  webserver:
+    image: nginx:alpine
+    container_name: webserver
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "80:80"
+    volumes:
+      - ./api-navetse:/var/www
+      - ./api-navetse/nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - navetse-network
+    depends_on:
+      - app
+
+  ## phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "9090:80"
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: db
+      PMA_USER: fsconsultoria
+      PMA_PASSWORD: admin123
+    networks:
+      - navetse-network
+
+#Networks
+networks:
+  navetse-network:
+    driver: bridge
+    
+#Volumes
+volumes:
+  dbdata:
+    driver: local
