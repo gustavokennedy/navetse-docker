@@ -58,5 +58,5 @@ Tabela 'navetse.vw_homepage' não existe:
 
 ```shell
 docker exec -it db bash
-mysql -uroot -proot navetse < bkp.navetse.sql
+mysql -uroot -proot navetse < /var/www/bkp.navetse.sql
 ```
