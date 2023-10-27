@@ -7,19 +7,19 @@ Repositório para deploy do ambiente Navetse com Docker.
 
 ### Aplicações
 
-	- mysql:3306
-	- phpmyadmin:9090
-	- webserver:80
-	- frontend:3000
-	- app:9000
+	mysql:3306
+	phpmyadmin:9090
+	webserver:80
+	frontend:3000
+	app:9000
 
 ## Instalação ⚙️
 
 A estrutura das pastas deve ser:
 
 ```shell
-   - api-navetse
-   - navetse
+   - api-navetse/
+   - navetse/
    - docker-compose.yml
 ```
 
