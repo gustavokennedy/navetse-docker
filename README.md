@@ -31,6 +31,13 @@ Depois com as pastas organizadas e com os arquivos .env feitos, execute:
 docker-compose up
 ```
 
+Logando com usuários seeders:
+
+```shell
+empresateste@fsconsultoria.net
+password123
+```
+
 ## Possíveis erros ❌
 
 #### Aplicação Frontend não logar:
