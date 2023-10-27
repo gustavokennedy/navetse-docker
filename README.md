@@ -54,3 +54,9 @@ FLUSH PRIVILEGES;
 
 Tabela 'navetse.vw_homepage' não existe:
 
+## Upload database Homologação
+
+```shell
+docker exec -it db bash
+mysql -uroot -proot navetse < bkp.navetse.sql
+```
